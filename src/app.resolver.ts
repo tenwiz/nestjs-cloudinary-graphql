@@ -1,12 +1,12 @@
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { CouldinaryResponse } from './app.model';
-import { AppService } from './app.service';
-import { GraphQLUpload } from 'apollo-server-express';
 import { FileUpload } from 'graphql-upload';
+import { CloudinaryService } from './cloudinary/cloudinary.service';
+import { GraphQLUpload } from 'apollo-server-express';
 
 @Resolver()
 export class AppResolver {
-  constructor(private readonly appService: AppService) {}
+  constructor(private readonly cloudinaryService: CloudinaryService) {}
 
   @Query(() => String)
   sayHello(): string {
@@ -18,6 +18,7 @@ export class AppResolver {
     @Args({ name: 'file', type: () => GraphQLUpload, nullable: true })
     file: FileUpload,
   ): Promise<CouldinaryResponse> {
-    return this.appService.uploadImageToCloudinary(file);
+    const stream = file.createReadStream();
+    return this.cloudinaryService.uploadImageFile(stream);
   }
 }
